@@ -1,4 +1,7 @@
+import datetime
 import htmlmin
+import icalendar
+import sys
 
 from bs4 import BeautifulSoup
 
@@ -422,7 +425,8 @@ source = u"""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://ww
     <td  class='cell-border'>&nbsp;</td>
 </table>
 
-<!-- START REPORT FOOTER --><br/>
+<!-- START REPORT FOOTER -->
+<br/>
 <!-- This file can contain items to go at the bottom of the Timetable Reports 
 
 This example contains the last week,  print next week links -->
@@ -497,16 +501,28 @@ body_tables = soup.find_all('table', class_="grid-border-args")
 
 # Merge the headers and bodies together
 timetables = zip(header_tables, body_tables)
+calendars = []
 
-for timetable in timetables:
-    header = timetable[0]
-    body = timetable[1]
-
+for header, body in timetables:
+    ical = icalendar.Calendar()
+    ical.add('version', '2.0')
+  
     title = header.find(class_='header-0-0-0').text
+    week1 = None
+    header_1_2_1 = header.find(class_='header-1-2-1').text
+    if header_1_2_1 == "1" or header_1_2_1.startswith("1-"):
+      week1 = header.find(class_='header-1-2-3').text.split("-")[0]
+    else:
+      print("Cannot find the start date of week 1")
+      sys.exit(0)
+      
+    week1 = datetime.datetime.strptime(week1, '%d %b %Y')
+    ical.add('dtstart', week1)
 
     # First row is the timeslot indicator
     day_rows = body.contents[1:]
 
+    daynum = 0
     for day in day_rows:
         time = 9
         # First col is the day indicator
@@ -516,8 +532,8 @@ for timetable in timetables:
             if event.text == u"\xa0":
                 time += 1
             else:
+                evt = icalendar.Event()
                 hours = int(event['colspan'])
-                time += hours
 
                 info = event.find_all('td')
 
@@ -529,3 +545,19 @@ for timetable in timetables:
                 weeks = info[6].text
 
                 print code, staff, module, event_type, room, weeks, hours
+                start = week1 + datetime.timedelta(days=daynum, hours=time)
+                evt.add('dtstart', start)
+                evt.add('dtend', start+datetime.timedelta(hours=hours))
+                evt.add('summary', module + " " + event_type)
+                # evt.add('rrule', {
+                #     'freq': ['WEEKLY'],
+                #     '': ''
+                # })
+                
+                ical.add_component(evt)
+                time += hours
+        daynum += 1
+    calendars.append(ical)
+    
+for cal in calendars:
+  print cal.to_ical()
