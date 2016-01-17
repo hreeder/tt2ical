@@ -1,13 +1,31 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>SWS to ICS Converter</h2>
-<form class="form-horizontal" method="POST" action>
-  <div class="form-group row">
-    <textarea class="form-control" rows="20" name="source" placeholder="Paste SWS page source code here"></textarea>
-  </div>
-  <div class="form-group row">
-    <input class="btn btn-primary btn-lg" name="" type="submit" value="Go"/>
-  </div>
-</form>
+  <h2>SWS to ICS Converter</h2>
+  <form class="form-horizontal" method="POST" action>
+    <div class="form-group row">
+      <textarea class="form-control" rows="20" name="source" placeholder="Paste SWS page source code here"></textarea>
+    </div>
+    <div class="form-group row">
+      <input class="btn btn-primary btn-lg" name="" type="submit" value="Go"/>
+    </div>
+  </form>
+
+  <hr>
+
+  <h3>How to use</h3>
+  <p>Open the timetable app from the Student Portal (eg the page <a
+          href="https://www2.napier.ac.uk/Timetable/tri2portal/Default.aspx">here</a>) and build a timetable.
+    Ensure you select the "Full Trimester" option for weeks.</p>
+  <p>Once you are at the view timetable page, right click the page and select your "View Source" option (Chrome shows this as "View Page Source", other browsers may vary).
+    Select everything (Ctrl+A), and paste it as is into the above text box, and hit Go.</p>
+  <hr>
+  <h4>Known Issues</h4>
+  <ul>
+    <li>Exporting modules with multiple events happening on the same day at the same time (or even an overlap) will break the exporter</li>
+  </ul>
+  <footer>
+  <hr>
+  <small>I take no responsibility if the data for an event is incorrect when exporting from this application. If you use this application you should ensure the data is accurate for what you exported.</small>
+  </footer>
 {% endblock %}
