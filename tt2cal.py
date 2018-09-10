@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import cStringIO
 import datetime
 import htmlmin
 import icalendar
@@ -8,6 +7,7 @@ import zipfile
 
 from bs4 import BeautifulSoup
 from flask import Flask, render_template, request, send_file, flash
+from io import StringIO
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(2048)
@@ -112,7 +112,7 @@ def get_calendars(source):
 
 
 def cal_to_file(calendar):
-    output = cStringIO.StringIO()
+    output = StringIO()
     output.write(calendar.to_ical())
     output.seek(0)
     return output
@@ -132,7 +132,7 @@ def main():
             if len(calendars) > 1:
                 files = [cal_to_file(cal) for cal in calendars]
                 n = 1
-                output = cStringIO.StringIO()
+                output = StringIO()
                 with zipfile.ZipFile(output, 'w') as zf:
                     for file in files:
                         name = "calendar_" + str(n) + ".ics"

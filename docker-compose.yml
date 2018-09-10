@@ -1,0 +1,7 @@
+version: '3.2'
+services:
+  tt2cal:
+    image: 'hreeder/tt2ical'
+    build: .
+    ports:
+      - 5000:5000
